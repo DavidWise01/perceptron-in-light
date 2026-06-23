@@ -4,61 +4,61 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Perceptron in Light — multiply by interference, sum on a wire</title>
-<meta name="description" content="A functional photonic perceptron. In light the multiply happens by interference (two fields beat at a 50:50 coupler; balanced photodetectors give an exact 2·x·w), the sum happens for free (photocurrents add on a bus), and the only hard part is the nonlinear threshold (photons don't interact). Live optical multiplier, full photonic neuron, and it learns AND/OR but not XOR (one cut → depth). Confidence-tiered: STRONG (optical MAC / MZI meshes, real & commercial) / MIDDLING (full photonic inference) / FRONTIER (all-optical nonlinearity & training). David Lee Wise, two-layer honest.">
+<meta name="description" content="A functional photonic perceptron on a laser optical bench. The multiply happens by interference (two fields beat at a 50:50 beamsplitter; balanced photodiodes give an exact 2·x·w), the sum happens for free (photocurrents add on a bus), and the hard part is the nonlinear threshold (photons don't interact). Live optical multiplier with scope fringe, full photonic neuron, learns AND/OR but not XOR (one cut → depth). Confidence-tiered: STRONG (optical MAC / MZI meshes) / MIDDLING (full photonic inference) / FRONTIER (all-optical nonlinearity). David Lee Wise, two-layer honest.">
 <style>
-  :root{--bg:#07080d;--panel:#0d0f17;--panel2:#13151f;--edge:#262a3a;--ink:#eef0f7;--dim:#9aa0b8;--faint:#646a86;
-    --sig:#ffcf6a;--sig2:#ffe2a3;--lo:#5ad1ff;--lo2:#a3e8ff;--mix:#b69bff;--ok:#54e0a0;--rose:#fb7185;--amber:#fbbf24;--ember:#fb923c;
+  :root{--bg:#04050a;--bench:#070a12;--panel:#0a0e18;--panel2:#10141f;--edge:#1d2740;--ink:#eef2fb;--dim:#94a0bd;--faint:#5c6688;
+    --sig:#ff6a4a;--sig2:#ffb199;--lo:#3fd2ff;--lo2:#a7ecff;--mix:#c08bff;--ok:#54e0a0;--rose:#fb7185;--amber:#fbbf24;--ember:#fb923c;
     --mono:'SFMono-Regular',ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;--serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;}
   *{box-sizing:border-box}
   html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);line-height:1.55;
-    background-image:radial-gradient(1200px 600px at 75% -10%,#1a1808 0%,transparent 55%),radial-gradient(900px 500px at 0% 100%,#06141c 0%,transparent 55%);}
+    background-image:radial-gradient(1200px 600px at 75% -10%,#1a0a08 0%,transparent 55%),radial-gradient(900px 500px at 0% 100%,#06121c 0%,transparent 55%);}
   .wrap{max-width:1040px;margin:0 auto;padding:42px 26px 90px}
   header{border-bottom:1px solid var(--edge);padding-bottom:22px;margin-bottom:24px}
-  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--sig);opacity:.9}
-  h1{font-size:34px;line-height:1.12;margin:.32em 0 .18em;font-weight:600}h1 em{color:var(--sig2);font-style:italic}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--sig);opacity:.95}
+  h1{font-size:34px;line-height:1.12;margin:.32em 0 .18em;font-weight:600}h1 em{color:var(--lo2);font-style:italic}
   .sub{color:var(--dim);font-size:15.5px;max-width:78ch}
   .lin{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:14px}.lin b{color:var(--sig)}.lin .l{color:var(--lo)}
   .verdicts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:22px 0}@media(max-width:720px){.verdicts{grid-template-columns:1fr}}
-  .vc{border:1px solid var(--edge);border-radius:11px;padding:13px 15px;border-top-width:3px}
+  .vc{border:1px solid var(--edge);border-radius:11px;padding:13px 15px;border-top-width:3px;background:rgba(10,14,24,.6)}
   .vc .badge{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.12em}
   .vc.s{border-top-color:var(--ok)}.vc.s .badge{color:var(--ok)}
   .vc.m{border-top-color:var(--amber)}.vc.m .badge{color:var(--amber)}
   .vc.f{border-top-color:var(--ember)}.vc.f .badge{color:var(--ember)}
   .vc p{font-size:12px;color:var(--dim);margin:6px 0 0;line-height:1.45}.vc p b{color:var(--ink)}
   section{margin:36px 0}
-  h2{font-size:13px;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--sig2);border-left:2px solid var(--sig);padding-left:11px;margin:0 0 6px}
+  h2{font-size:13px;font-family:var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--lo2);border-left:2px solid var(--sig);padding-left:11px;margin:0 0 6px}
   .lede{color:var(--dim);font-size:15px;margin:0 0 18px;max-width:80ch}
-  .panel{background:linear-gradient(180deg,var(--panel),#080a10);border:1px solid var(--edge);border-radius:14px;padding:20px;box-shadow:0 24px 60px -40px #000}
+  .panel{position:relative;background:linear-gradient(180deg,var(--panel),#06080f);border:1px solid var(--edge);border-radius:14px;padding:20px;box-shadow:0 24px 60px -40px #000, inset 0 1px 0 rgba(120,150,200,.05)}
+  .panel::before{content:"OPTICAL BENCH · λ=1550nm";position:absolute;top:9px;right:14px;font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:#37425e}
   .controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-bottom:14px}
-  button{font-family:var(--mono);font-size:12px;color:var(--ink);background:#1a1d2a;border:1px solid var(--edge);border-radius:8px;padding:8px 13px;cursor:pointer;transition:.15s}
-  button:hover{background:#23273a;border-color:var(--sig)}button.on{background:#7a5a12;border-color:var(--sig);color:#fff}
-  button.in{min-width:74px}button.hi{background:#3a2e0c;border-color:var(--sig);color:var(--sig2)}button.lo2{background:#0c2c3a;border-color:var(--lo);color:var(--lo2)}
+  button{font-family:var(--mono);font-size:12px;color:var(--ink);background:#101626;border:1px solid var(--edge);border-radius:8px;padding:8px 13px;cursor:pointer;transition:.15s}
+  button:hover{background:#16203a;border-color:var(--lo)}button.on{background:#0c3a52;border-color:var(--lo);color:#fff;box-shadow:0 0 14px -3px var(--lo)}
+  button.in{min-width:74px}button.hi{background:#3a1410;border-color:var(--sig);color:var(--sig2)}button.lo2{background:#0c2c3a;border-color:var(--lo);color:var(--lo2)}
   label.sl{font-family:var(--mono);font-size:11px;color:var(--dim);display:flex;align-items:center;gap:8px}
-  input[type=range]{width:120px}
-  .sigr{accent-color:var(--sig)}.lor{accent-color:var(--lo)}
-  canvas{display:block;width:100%;border-radius:10px;background:#05070c;border:1px solid var(--edge)}
+  input[type=range]{width:120px}.sigr{accent-color:var(--sig)}.lor{accent-color:var(--lo)}
+  canvas{display:block;width:100%;border-radius:10px;background:#03040a;border:1px solid var(--edge)}
   .cap{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:7px}
   .pgrid{display:grid;grid-template-columns:1.25fr .75fr;gap:22px}@media(max-width:820px){.pgrid{grid-template-columns:1fr}}
   .reads{display:flex;flex-direction:column;gap:12px}
   .stat .v{font-family:var(--mono);font-size:26px;font-weight:600}.stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
   .pill{font-family:var(--mono);font-size:18px;font-weight:700;padding:5px 14px;border-radius:9px;display:inline-block;min-width:120px;text-align:center}
-  .pill.fire{background:var(--ok);color:#04140c}.pill.dark{background:#181a26;color:var(--faint);border:1px solid var(--edge)}
-  .eq{font-family:var(--mono);font-size:13px;color:var(--sig2);background:#15120a;border:1px solid var(--edge);border-radius:8px;padding:9px 11px;display:inline-block;margin:4px 0}
+  .pill.fire{background:var(--ok);color:#04140c;box-shadow:0 0 16px -3px var(--ok)}.pill.dark{background:#0c1018;color:var(--faint);border:1px solid var(--edge)}
+  .eq{font-family:var(--mono);font-size:13px;color:var(--lo2);background:#081420;border:1px solid var(--edge);border-radius:8px;padding:9px 11px;display:inline-block;margin:4px 0}
   .note{color:var(--dim);font-size:13.5px;border-left:2px solid var(--edge);padding-left:13px;margin:16px 0 0}
   .map{font-family:var(--mono);font-size:12.5px;display:grid;grid-template-columns:auto auto;gap:4px 14px;margin:8px 0}.map b{color:var(--sig)}.map span{color:var(--dim)}
   footer{margin-top:46px;border-top:1px solid var(--edge);padding-top:18px;color:var(--faint);font-family:var(--mono);font-size:11px;line-height:1.7}
-  footer a,.bar a{color:var(--sig)}.bar{font-family:var(--mono);font-size:11.5px;margin-bottom:16px}.bar a{text-decoration:none;border-bottom:1px dotted #3a3e54}
-  code{font-family:var(--mono);color:var(--sig2);background:#15120a;padding:1px 5px;border-radius:5px}
+  footer a,.bar a{color:var(--lo)}.bar{font-family:var(--mono);font-size:11.5px;margin-bottom:16px}.bar a{text-decoration:none;border-bottom:1px dotted #2c3a54}
+  code{font-family:var(--mono);color:var(--lo2);background:#081420;padding:1px 5px;border-radius:5px}
 </style>
 </head>
 <body>
 <div class="wrap">
-<div class="bar"><a href="https://davidwise01.github.io/ud0/">◄ UD0</a> &nbsp; <a href="https://davidwise01.github.io/perceptron-in-silicon/">silicon</a> &nbsp; <a href="https://davidwise01.github.io/perceptron-in-a-quantum-dot/">quantum dot</a> &nbsp; <a href="https://davidwise01.github.io/photonic/">photonic processor</a></div>
+<div class="bar"><a href="https://davidwise01.github.io/ud0/">◄ UD0</a> &nbsp; <a href="https://davidwise01.github.io/perceptron-in-silicon/">silicon</a> &nbsp; <a href="https://davidwise01.github.io/perceptron-in-a-quantum-dot/">quantum dot</a> &nbsp; <a href="https://davidwise01.github.io/perceptron-in-a-crossbar/">crossbar</a> &nbsp; <a href="https://davidwise01.github.io/photonic/">photonic processor</a></div>
 <header>
   <div class="kicker">Perceptron theory · the substrate jump · the fourth body</div>
   <h1>The perceptron in <em>light</em></h1>
-  <div class="sub">Photonics is built for this, with one catch. The <em>multiply</em> falls out of interference — two light fields beat at a beamsplitter and a balanced detector reads their product, exactly, at the speed of light, with no transistor. The <em>sum</em> is free: photocurrents from many channels just add on one wire. What light <em>won't</em> do is the threshold — photons ignore each other — so the nonlinearity is the part that fights back. Two-thirds of a perceptron for free; the last third is the whole research field.</div>
-  <div class="lin"><b>weights &amp; inputs</b> = field amplitudes &nbsp;·&nbsp; <b>multiply</b> = interference at a 50:50 coupler &nbsp;·&nbsp; <span class="l">sum</span> = photocurrents add on a bus &nbsp;·&nbsp; <b>threshold</b> = the hard part (square-law detect + electronics)</div>
+  <div class="sub">Photonics is built for this, with one catch. The <em>multiply</em> falls out of interference — two laser fields beat at a beamsplitter and a balanced detector reads their product, exactly, at the speed of light, no transistor. The <em>sum</em> is free: photocurrents from many channels just add on one wire. What light <em>won't</em> do is the threshold — photons ignore each other — so the nonlinearity is the part that fights back. Two-thirds of a perceptron for free; the last third is the whole research field.</div>
+  <div class="lin"><b>weights &amp; inputs</b> = field amplitudes &nbsp;·&nbsp; <b>multiply</b> = interference at a 50:50 beamsplitter &nbsp;·&nbsp; <span class="l">sum</span> = photocurrents add on a bus &nbsp;·&nbsp; <b>threshold</b> = square-law detect + electronics</div>
 </header>
 
 <div class="verdicts">
@@ -67,10 +67,10 @@
   <div class="vc f"><span class="badge">◔ FRONTIER</span><p><b>All-optical nonlinearity &amp; in-situ training.</b> A threshold without leaving the optical domain (saturable absorbers, cavity effects) and training the phases optically are <b>genuinely open</b>.</p></div>
 </div>
 
-<!-- ===== MODULE I : THE OPTICAL MULTIPLY ===== -->
+<!-- ===== MODULE I ===== -->
 <section>
   <h2>I · Multiplication by interference</h2>
-  <p class="lede">Send a <b style="color:var(--sig)">signal</b> field <code>x</code> and a <b style="color:var(--lo)">weight</b> field <code>w</code> into a 50:50 coupler. The outputs are <code>(x+w)/√2</code> and <code>(x−w)/√2</code>; two photodetectors square them, and the <em>balanced difference</em> is <span class="eq">|x+w|²/2 − |x−w|²/2 = 2·x·w</span> A real multiplication, done by two beams crossing. Sign rides on phase (a π flip = a minus sign). Slide the amplitudes — the balanced reading <em>is</em> the product.</p>
+  <p class="lede">Two laser diodes launch a <b style="color:var(--sig)">signal</b> field <code>x</code> and a <b style="color:var(--lo)">weight</b> field <code>w</code> into a 50:50 beamsplitter. The outputs are <code>(x+w)/√2</code> and <code>(x−w)/√2</code>; two photodiodes square them, and the <em>balanced difference</em> is <span class="eq">|x+w|²/2 − |x−w|²/2 = 2·x·w</span> A real multiplication, done by two beams crossing. Sign rides on phase (a π flip = a minus sign). Slide the amplitudes — the balanced reading <em>is</em> the product.</p>
   <div class="panel">
     <div class="controls">
       <label class="sl">signal x <input class="sigr" type="range" id="ax" min="-100" max="100" value="70"></label>
@@ -79,18 +79,18 @@
     </div>
     <div class="pgrid">
       <div><canvas id="mul" width="560" height="300"></canvas>
-        <div class="cap"><b style="color:var(--sig)">signal x</b> + <b style="color:var(--lo)">weight w</b> → 50:50 coupler → two detectors · D⁺ reads |x+w|² , D⁻ reads |x−w|² · balanced output D⁺−D⁻ = 2xw</div></div>
+        <div class="cap"><b style="color:var(--sig)">signal x</b> + <b style="color:var(--lo)">weight w</b> → 50:50 beamsplitter → two photodiodes (D⁺, D⁻) → balanced output D⁺−D⁻ = 2xw · scope shows the interference fringe</div></div>
       <div class="reads">
         <div class="stat"><div class="v" id="prod" style="color:var(--mix)">+0.00</div><div class="k">balanced output  D⁺ − D⁻  = 2·x·w</div></div>
         <div class="stat"><div class="v" id="check" style="font-size:15px;color:var(--ok)">—</div><div class="k">vs arithmetic 2·x·w</div></div>
         <div class="map"><b>multiply</b><span>= the interference cross-term</span><b>the sign</b><span>= a π phase flip</span><b>speed</b><span>= time-of-flight, no clock</span></div>
-        <div class="note">Flip either field negative (phase π) and the product flips — interference handles signed weights natively, where electronics needs an extra circuit. Hit <b>sweep</b> to watch the detector power trace a cosine fringe: that fringe <em>is</em> the analog multiply.</div>
+        <div class="note">Flip either field negative (phase π) and the product flips — interference handles signed weights natively. Hit <b>sweep</b> to watch the photodiode power trace a cosine fringe on the scope: that fringe <em>is</em> the analog multiply.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== MODULE II : THE PHOTONIC NEURON ===== -->
+<!-- ===== MODULE II ===== -->
 <section>
   <h2>II · The neuron — many multiplies, one wire, one threshold</h2>
   <p class="lede">Stack the multipliers. Each input channel <code>xᵢ</code> beats against its weight field <code>wᵢ</code>; every channel's photocurrent drops onto a shared <b style="color:var(--lo)">bus</b> and they simply <em>add</em> — the accumulate is just Kirchhoff's law. The summed current hits a comparator: above the line, the neuron fires. The optical part ends at the detector; the threshold is where electrons quietly take over.</p>
@@ -103,20 +103,20 @@
     </div>
     <div class="pgrid">
       <div><canvas id="neu" width="560" height="300"></canvas>
-        <div class="cap">two homodyne multipliers · photocurrents sum on the bus · comparator = the threshold (electronic)</div></div>
+        <div class="cap">two homodyne multipliers on the bench · photocurrents sum on the bus · comparator = the threshold (electronic)</div></div>
       <div class="reads">
         <div class="stat"><div class="v" id="sum" style="color:var(--lo2)">0.00</div><div class="k">Σ photocurrent  =  b + Σ xᵢwᵢ</div></div>
         <div class="stat"><div class="v"><span class="pill dark" id="fire">DARK</span></div><div class="k">fires when Σ &gt; 0</div></div>
-        <div class="note">The sum costs nothing — currents add by themselves. That's the structural reason photonics is fast: an N-wide dot product is one pass of light, not N multiply-adds. The bottleneck isn't the math; it's getting data in and the threshold out.</div>
+        <div class="note">The sum costs nothing — currents add by themselves. That's the structural reason photonics is fast: an N-wide dot product is one pass of light, not N multiply-adds. The bottleneck isn't the math; it's data in and the threshold out.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== MODULE III : IT LEARNS ===== -->
+<!-- ===== MODULE III ===== -->
 <section>
   <h2>III · It learns — one cut, then depth</h2>
-  <p class="lede">Train the weight fields with the perceptron rule and the photonic neuron learns a linearly-separable rule outright. As ever, it draws one straight cut — <code>AND</code> and <code>OR</code> fall; <code>XOR</code> stalls at 3/4 (verified). The fix repeats across every body in this series: a second layer — here, a nonlinear node feeding a second photonic neuron — folds the space. Coupled dots, dendrites, hidden layers, a second optical stage: one idea, four costumes.</p>
+  <p class="lede">Train the weight fields with the perceptron rule and the photonic neuron learns a linearly-separable rule outright. As ever, it draws one straight cut — <code>AND</code> and <code>OR</code> fall; <code>XOR</code> stalls at 3/4 (verified). The fix repeats across every body: a second layer — a nonlinear node feeding a second photonic stage — folds the space. Coupled dots, dendrites, hidden layers, stacked crossbars, a second optical stage: one idea, many costumes.</p>
   <div class="panel">
     <div class="controls">
       target: <button class="t on" data-t="and">AND</button><button class="t" data-t="or">OR</button><button class="t" data-t="xor">XOR</button>
@@ -125,11 +125,11 @@
     </div>
     <div class="pgrid">
       <div><canvas id="learn" width="560" height="300"></canvas>
-        <div class="cap">input plane · gold = neuron fires · corners ringed green when correct for the target</div></div>
+        <div class="cap">input plane · the beam color marks where the neuron fires · corners ringed green when correct</div></div>
       <div class="reads">
-        <div class="stat"><div class="v" id="acc" style="color:var(--sig2)">—</div><div class="k">cases correct</div></div>
+        <div class="stat"><div class="v" id="acc" style="color:var(--lo2)">—</div><div class="k">cases correct</div></div>
         <div class="stat"><div class="v" id="vd" style="font-size:16px;color:var(--dim)">—</div><div class="k">verdict</div></div>
-        <div class="note" id="note3">Pick a target and hit train — for AND/OR the weight fields settle and all four corners ring green in a few sweeps. Switch to XOR and one corner stays crossed no matter how long it trains: one cut can't split the diagonals. <b>Add a 2nd optical layer</b> and the boundary bends — XOR snaps to 4/4. Depth is the universal escape from the line.</div>
+        <div class="note" id="note3">Pick a target and hit train — for AND/OR the weight fields settle and all four corners ring green in a few sweeps. Switch to XOR and one corner stays crossed: one cut can't split the diagonals. <b>Add a 2nd optical layer</b> and the boundary bends — XOR snaps to 4/4. Depth is the universal escape from the line.</div>
       </div>
     </div>
   </div>
@@ -137,49 +137,69 @@
 
 <footer>
   THE PERCEPTRON IN LIGHT · the fourth body · confidence-tiered<br>
-  physics verified in Node before build · balanced homodyne D⁺−D⁻ = 2·x·w exactly (x·w from +1·+1 to −0.7·0.9) · learns AND 4/4, OR 4/4, XOR 3/4 (one cut)<br>
+  physics verified in Node before build · balanced homodyne D⁺−D⁻ = 2·x·w exactly · learns AND 4/4, OR 4/4, XOR 3/4 (one cut)<br>
   MZI-mesh photonic deep learning (Shen et al., Nature Photonics 2017) · broadcast-and-weight (Tait et al.) · coherent optical MAC (Lightmatter) · all-optical nonlinearity = open<br>
-  siblings: <a href="https://davidwise01.github.io/perceptron-in-silicon/">silicon</a> · <a href="https://davidwise01.github.io/perceptron-in-a-quantum-dot/">quantum dot</a> · <a href="https://davidwise01.github.io/the-gather/">the gather</a> · governor David Lee Wise · CC-BY-ND-4.0
+  siblings: <a href="https://davidwise01.github.io/perceptron-in-silicon/">silicon</a> · <a href="https://davidwise01.github.io/perceptron-in-a-quantum-dot/">quantum dot</a> · <a href="https://davidwise01.github.io/perceptron-in-a-crossbar/">crossbar</a> · <a href="https://davidwise01.github.io/the-gather/">the gather</a> · governor David Lee Wise · CC-BY-ND-4.0
 </footer>
 </div>
 <script>
 "use strict";
 function fit(cv){const r=cv.getBoundingClientRect();const dpr=window.devicePixelRatio||1;cv.width=r.width*dpr;cv.height=r.height*dpr;const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);return{g,w:r.width,h:r.height};}
+function bench(g,w,h){ // optical-table breadboard dot grid
+  g.fillStyle='#03040a';g.fillRect(0,0,w,h);
+  g.fillStyle='rgba(80,110,160,.10)';for(let y=14;y<h;y+=22)for(let x=14;x<w;x+=22){g.beginPath();g.arc(x,y,1,0,7);g.fill();}
+}
+function beam(g,x0,y0,x1,y1,col,amp){ // glowing laser beam, thickness/alpha ~ amplitude
+  const a=Math.min(1,Math.abs(amp));
+  g.save();g.strokeStyle=col;g.globalAlpha=.25+.55*a;g.shadowBlur=10+10*a;g.shadowColor=col;g.lineWidth=1.5+3*a;
+  g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();g.restore();
+}
+function laser(g,x,y,col,lab){ // laser-diode source
+  g.fillStyle='#0c1322';g.strokeStyle=col;g.lineWidth=1.5;g.beginPath();g.roundRect(x-26,y-12,26,24,4);g.fill();g.stroke();
+  g.fillStyle=col;g.shadowBlur=10;g.shadowColor=col;g.beginPath();g.arc(x,y,4,0,7);g.fill();g.shadowBlur=0;
+  g.fillStyle='#5c6688';g.font='9px ui-monospace,monospace';g.textAlign='center';g.fillText(lab,x-13,y-16);
+}
+function bsplit(g,x,y){ // 50:50 beamsplitter cube
+  g.save();g.translate(x,y);g.fillStyle='rgba(192,139,255,.10)';g.strokeStyle='#c08bff';g.lineWidth=1.5;
+  g.beginPath();g.rect(-13,-13,26,26);g.fill();g.stroke();
+  g.strokeStyle='rgba(192,139,255,.7)';g.beginPath();g.moveTo(-13,13);g.lineTo(13,-13);g.stroke();g.restore();
+  g.fillStyle='#7d88aa';g.font='9px ui-monospace,monospace';g.textAlign='center';g.fillText('50:50',x,y-18);
+}
+function pd(g,x,y,col,P,lab){ // photodiode with glow ~ power
+  const a=Math.min(1,P);g.save();g.translate(x,y);
+  g.fillStyle='#0c1322';g.strokeStyle=col;g.lineWidth=1.5;g.beginPath();g.moveTo(-3,-13);g.lineTo(16,0);g.lineTo(-3,13);g.closePath();g.fill();g.stroke();
+  g.fillStyle=col;g.globalAlpha=.3+.6*a;g.shadowBlur=4+12*a;g.shadowColor=col;g.beginPath();g.arc(2,0,3,0,7);g.fill();g.restore();
+  g.fillStyle=col;g.font='10px ui-monospace,monospace';g.textAlign='left';g.fillText(lab+' '+P.toFixed(2),x-2,y-18);
+}
 
-// ===== MODULE I : optical multiply =====
+// ===== MODULE I =====
 (function(){
-  const cv=document.getElementById('mul');let ax=0.7,aw=0.8,t=0,sweeping=false,sw=0;
+  const cv=document.getElementById('mul');let ax=0.7,aw=0.8,t=0,sweeping=false,sw=0,scope=[];
   function draw(){
-    const{g,w,h}=fit(cv);g.clearRect(0,0,w,h);
-    const phi=sweeping?sw:0; // relative phase for fringe
-    const y1=h*0.3,y2=h*0.62,couplerX=w*0.5,detX=w-70;
-    // input waveguides with travelling waves
-    function wave(y,amp,col,x0,x1,phase){
-      g.strokeStyle=col;g.lineWidth=2;g.globalAlpha=.95;g.beginPath();
-      for(let x=x0;x<=x1;x+=3){const yy=y+Math.sin((x-t*2)*0.09+phase)*amp*16;x===x0?g.moveTo(x,yy):g.lineTo(x,yy);}g.stroke();g.globalAlpha=1;
-      // guide line
-      g.strokeStyle='#1a1d2a';g.lineWidth=1;g.beginPath();g.moveTo(x0,y);g.lineTo(x1,y);g.stroke();
-    }
-    wave(y1,ax,'#ffcf6a',20,couplerX,0);
-    wave(y2,aw,'#5ad1ff',20,couplerX,phi);
-    // coupler box
-    g.fillStyle='#13151f';g.strokeStyle='#b69bff';g.lineWidth=2;g.fillRect(couplerX-6,y1-14,12,(y2-y1)+28);g.strokeRect(couplerX-6,y1-14,12,(y2-y1)+28);
-    g.fillStyle='#b69bff';g.font='10px ui-monospace,monospace';g.textAlign='center';g.fillText('50:50',couplerX,y1-22);
-    // outputs
-    const o1=(ax+aw*Math.cos(phi))/Math.SQRT2, o1i=(aw*Math.sin(phi))/Math.SQRT2;
-    const o2=(ax-aw*Math.cos(phi))/Math.SQRT2, o2i=(-aw*Math.sin(phi))/Math.SQRT2;
-    const P1=o1*o1+o1i*o1i, P2=o2*o2+o2i*o2i;
-    wave(y1,Math.sqrt(P1),'#ffe2a3',couplerX,detX,0);
-    wave(y2,Math.sqrt(P2),'#a3e8ff',couplerX,detX,0);
-    // detectors
-    [[y1,P1,'D⁺','#ffcf6a'],[y2,P2,'D⁻','#5ad1ff']].forEach(([y,P,lab,c])=>{
-      g.fillStyle='#1a1d2a';g.strokeStyle=c;g.lineWidth=1.5;g.beginPath();g.moveTo(detX,y-14);g.lineTo(detX+22,y);g.lineTo(detX,y+14);g.closePath();g.fill();g.stroke();
-      g.fillStyle=c;g.font='11px ui-monospace,monospace';g.textAlign='left';g.fillText(lab+' '+P.toFixed(2),detX-4,y-20);
-    });
+    const{g,w,h}=fit(cv);bench(g,w,h);
+    const phi=sweeping?sw:0;
+    const ys=h*0.30,yl=h*0.60,bsx=w*0.46,detX=w-70;
+    laser(g,46,ys,'#ff6a4a','x λ');laser(g,46,yl,'#3fd2ff','w λ');
+    beam(g,46,ys,bsx,ys,'#ff6a4a',ax);beam(g,46,yl,bsx,yl,'#3fd2ff',aw);
+    bsplit(g,bsx,(ys+yl)/2);
+    // route beams into BS center then out
+    beam(g,bsx,ys,bsx,(ys+yl)/2,'#ff6a4a',ax*0.6);beam(g,bsx,yl,bsx,(ys+yl)/2,'#3fd2ff',aw*0.6);
+    const o1=(ax+aw*Math.cos(phi))/Math.SQRT2,o1i=(aw*Math.sin(phi))/Math.SQRT2;
+    const o2=(ax-aw*Math.cos(phi))/Math.SQRT2,o2i=(-aw*Math.sin(phi))/Math.SQRT2;
+    const P1=o1*o1+o1i*o1i,P2=o2*o2+o2i*o2i;
+    beam(g,bsx,(ys+yl)/2,detX,ys,'#c08bff',Math.sqrt(P1));beam(g,bsx,(ys+yl)/2,detX,yl,'#c08bff',Math.sqrt(P2));
+    pd(g,detX,ys,'#ff6a4a',P1,'D⁺');pd(g,detX,yl,'#3fd2ff',P2,'D⁻');
     const prod=P1-P2;
+    // scope inset (the fringe)
+    scope.push(prod/2);if(scope.length>120)scope.shift();
+    const sx0=w*0.62,sy0=h*0.80,sw0=w*0.34,sh0=h*0.30;
+    g.fillStyle='rgba(4,8,14,.85)';g.strokeStyle='#1d2740';g.lineWidth=1;g.fillRect(sx0,sy0-sh0,sw0,sh0);g.strokeRect(sx0,sy0-sh0,sw0,sh0);
+    g.strokeStyle='#14406a';g.globalAlpha=.5;g.beginPath();g.moveTo(sx0,sy0-sh0/2);g.lineTo(sx0+sw0,sy0-sh0/2);g.stroke();g.globalAlpha=1;
+    g.strokeStyle='#54e0a0';g.lineWidth=1.5;g.beginPath();scope.forEach((v,i)=>{const X=sx0+(i/119)*sw0,Y=sy0-sh0/2-v*sh0*0.42;i?g.lineTo(X,Y):g.moveTo(X,Y);});g.stroke();
+    g.fillStyle='#37425e';g.font='8px ui-monospace,monospace';g.textAlign='left';g.fillText('SCOPE · balanced out',sx0+4,sy0-sh0+10);
     document.getElementById('prod').textContent=(prod>=0?'+':'')+prod.toFixed(2);
     const exact=2*ax*aw*Math.cos(phi);
-    const ck=document.getElementById('check');ck.textContent=(Math.abs(prod-exact)<1e-6?'= 2xw ✓ exact':'2xw='+exact.toFixed(2));
+    document.getElementById('check').textContent=(Math.abs(prod-exact)<1e-6?'= 2xw ✓ exact':'2xw='+exact.toFixed(2));
     if(sweeping){sw+=0.04;if(sw>Math.PI*2)sw=0;}
     t++;requestAnimationFrame(draw);
   }
@@ -189,37 +209,35 @@ function fit(cv){const r=cv.getBoundingClientRect();const dpr=window.devicePixel
   draw();
 })();
 
-// ===== MODULE II : the neuron =====
+// ===== MODULE II =====
 (function(){
   const cv=document.getElementById('neu');let x1=1,x2=-1,w1=0.6,w2=0.6,wb=-0.3,t=0,parts=[];
   function sumv(){return wb + x1*w1 + x2*w2;}
   function draw(){
-    const{g,w,h}=fit(cv);g.clearRect(0,0,w,h);
-    const on=sumv()>0;const chY=[h*0.26,h*0.56],busY=h*0.82,couplerX=w*0.4,compX=w-120;
-    // channels
-    [[chY[0],x1,w1,'x₁'],[chY[1],x2,w2,'x₂']].forEach(([y,x,wv,lab])=>{
+    const{g,w,h}=fit(cv);bench(g,w,h);
+    const on=sumv()>0;const chY=[h*0.24,h*0.50],busY=h*0.80,bsx=w*0.40,compX=w-120;
+    [[chY[0],x1,w1,'x₁','#ff6a4a'],[chY[1],x2,w2,'x₂','#3fd2ff']].forEach(([y,x,wv,lab,col])=>{
       const prod=x*wv;
-      g.strokeStyle='#ffcf6a';g.lineWidth=2;g.globalAlpha=.9;g.beginPath();for(let xx=20;xx<=couplerX;xx+=3){g.lineTo(xx,y+Math.sin((xx-t*2)*0.1)*Math.abs(x)*9);}g.stroke();g.globalAlpha=1;
-      g.fillStyle='#13151f';g.strokeStyle='#b69bff';g.lineWidth=1.5;g.fillRect(couplerX-5,y-11,10,22);g.strokeRect(couplerX-5,y-11,10,22);
-      // line to bus, current proportional to product
-      g.strokeStyle=prod>=0?'rgba(90,209,255,.6)':'rgba(251,113,133,.6)';g.lineWidth=1+Math.abs(prod)*4;
-      g.beginPath();g.moveTo(couplerX+6,y);g.lineTo(couplerX+40,y);g.lineTo(couplerX+40,busY);g.stroke();
-      g.fillStyle='#9aa0b8';g.font='11px ui-monospace,monospace';g.textAlign='right';g.fillText(lab+'·w='+prod.toFixed(2),couplerX-12,y+4);
+      laser(g,42,y,col,lab);
+      beam(g,42,y,bsx,y,col,Math.abs(x));
+      bsplit(g,bsx,y);
+      g.save();g.strokeStyle=prod>=0?'rgba(63,210,255,.6)':'rgba(251,113,133,.6)';g.lineWidth=1+Math.abs(prod)*4;g.shadowBlur=6;g.shadowColor=prod>=0?'#3fd2ff':'#fb7185';
+      g.beginPath();g.moveTo(bsx+8,y);g.lineTo(bsx+40,y);g.lineTo(bsx+40,busY);g.stroke();g.restore();
+      g.fillStyle='#94a0bd';g.font='11px ui-monospace,monospace';g.textAlign='center';g.fillText('x·w='+prod.toFixed(2),bsx+40,(y+busY)/2);
     });
-    // bias drop
-    g.strokeStyle='#646a86';g.lineWidth=1+Math.abs(wb)*4;g.beginPath();g.moveTo(couplerX-40,busY-40);g.lineTo(couplerX-40,busY);g.stroke();
-    g.fillStyle='#646a86';g.font='10px ui-monospace,monospace';g.textAlign='center';g.fillText('bias',couplerX-40,busY-46);
-    // the bus
-    g.strokeStyle='#5ad1ff';g.lineWidth=3;g.beginPath();g.moveTo(couplerX-50,busY);g.lineTo(compX,busY);g.stroke();
-    g.fillStyle='#646a86';g.textAlign='left';g.fillText('summing bus (currents add)',couplerX-46,busY+18);
+    // bias
+    g.strokeStyle='#5c6688';g.lineWidth=1+Math.abs(wb)*4;g.beginPath();g.moveTo(bsx-36,busY-40);g.lineTo(bsx-36,busY);g.stroke();
+    g.fillStyle='#5c6688';g.font='10px ui-monospace,monospace';g.textAlign='center';g.fillText('bias',bsx-36,busY-46);
+    // bus
+    g.save();g.strokeStyle='#3fd2ff';g.lineWidth=3;g.shadowBlur=8;g.shadowColor='#3fd2ff';g.beginPath();g.moveTo(bsx-46,busY);g.lineTo(compX,busY);g.stroke();g.restore();
+    g.fillStyle='#5c6688';g.textAlign='left';g.fillText('summing bus (currents add)',bsx-42,busY+18);
     // comparator
-    g.fillStyle='#1a1d2a';g.strokeStyle=on?'#54e0a0':'#646a86';g.lineWidth=2;
+    g.fillStyle='#101626';g.strokeStyle=on?'#54e0a0':'#5c6688';g.lineWidth=2;
     g.beginPath();g.moveTo(compX,busY-22);g.lineTo(compX+34,busY);g.lineTo(compX,busY+22);g.closePath();g.fill();g.stroke();
-    g.fillStyle=on?'#54e0a0':'#646a86';g.textAlign='center';g.font='11px ui-monospace,monospace';g.fillText('θ',compX+12,busY+4);
-    // output pulse
+    g.fillStyle=on?'#54e0a0':'#5c6688';g.textAlign='center';g.font='11px ui-monospace,monospace';g.fillText('θ',compX+11,busY+4);
     if(on){if(t%6===0)parts.push({p:0});}
     parts.forEach(pp=>pp.p+=0.05);parts=parts.filter(pp=>pp.p<1);
-    parts.forEach(pp=>{const X=compX+34+pp.p*60;g.fillStyle='#54e0a0';g.beginPath();g.arc(X,busY,3.5,0,7);g.fill();});
+    parts.forEach(pp=>{const X=compX+34+pp.p*60;g.fillStyle='#54e0a0';g.shadowBlur=8;g.shadowColor='#54e0a0';g.beginPath();g.arc(X,busY,3.5,0,7);g.fill();g.shadowBlur=0;});
     document.getElementById('sum').textContent=(sumv()>=0?'+':'')+sumv().toFixed(2);
     const f=document.getElementById('fire');f.textContent=on?'⚡ FIRES':'DARK';f.className='pill '+(on?'fire':'dark');
     document.getElementById('x1').className='in '+(x1>0?'hi':'lo2');document.getElementById('x1').textContent=x1>0?'+1':'−1';
@@ -233,37 +251,30 @@ function fit(cv){const r=cv.getBoundingClientRect();const dpr=window.devicePixel
   draw();
 })();
 
-// ===== MODULE III : learns =====
+// ===== MODULE III =====
 (function(){
   const cv=document.getElementById('learn');let target='and',depth=false,W=[0,0,0],trained=false;
   const inp=[[-1,-1],[-1,1],[1,-1],[1,1]];
   const tgt={and:(a,b)=>(a>0&&b>0)?1:0,or:(a,b)=>(a>0||b>0)?1:0,xor:(a,b)=>((a>0)!==(b>0))?1:0};
   function f1(w,a,b){return (w[0]+w[1]*a+w[2]*b)>0?1:0;}
-  function fire(a,b){
-    if(!depth||target!=='xor')return f1(W,a,b);
-    const orF=(1.5+a+b)>0?1:0,nand=(1.5-a-b)>0?1:0;return (orF&&nand)?1:0; // 2-layer
-  }
-  function train(){
-    W=[0,0,0];const L=0.5;
-    for(let ep=0;ep<300;ep++){let e=0;for(const[a,b]of inp){const t=tgt[target](a,b),y=f1(W,a,b);if(y!==t){const d=t-y;W[0]+=L*d;W[1]+=L*d*a;W[2]+=L*d*b;e++;}}if(!e)break;}
-    trained=true;
-  }
+  function fire(a,b){if(!depth||target!=='xor')return f1(W,a,b);const orF=(1.5+a+b)>0?1:0,nand=(1.5-a-b)>0?1:0;return (orF&&nand)?1:0;}
+  function train(){W=[0,0,0];const L=0.5;for(let ep=0;ep<300;ep++){let e=0;for(const[a,b]of inp){const t=tgt[target](a,b),y=f1(W,a,b);if(y!==t){const d=t-y;W[0]+=L*d;W[1]+=L*d*a;W[2]+=L*d*b;e++;}}if(!e)break;}trained=true;}
   function draw(){
-    const{g,w,h}=fit(cv);g.clearRect(0,0,w,h);
+    const{g,w,h}=fit(cv);g.fillStyle='#03040a';g.fillRect(0,0,w,h);
     const S=Math.min(w,h)-30,ox=(w-S)/2,oy=(h-S)/2,RES=54,cell=S/RES;
     for(let gy=0;gy<RES;gy++)for(let gx=0;gx<RES;gx++){const a=(gx/(RES-1))*2.6-1.3,b=1.3-(gy/(RES-1))*2.6;
-      g.fillStyle=fire(a,b)?'rgba(255,207,106,.16)':'rgba(20,22,32,.5)';g.fillRect(ox+gx*cell,oy+gy*cell,cell+1,cell+1);}
-    g.strokeStyle='#262a3a';g.lineWidth=1;g.strokeRect(ox,oy,S,S);
+      g.fillStyle=fire(a,b)?'rgba(63,210,255,.16)':'rgba(10,14,24,.5)';g.fillRect(ox+gx*cell,oy+gy*cell,cell+1,cell+1);}
+    g.strokeStyle='#1d2740';g.lineWidth=1;g.strokeRect(ox,oy,S,S);
     const P=(a,b)=>[ox+((a+1.3)/2.6)*S,oy+((1.3-b)/2.6)*S];let correct=0;
     inp.forEach(([a,b])=>{const want=tgt[target](a,b),got=fire(a,b),ok=want===got;if(ok)correct++;const[X,Y]=P(a,b);
-      g.beginPath();g.arc(X,Y,9,0,7);g.fillStyle=want?'#ffcf6a':'#5ad1ff';g.fill();
+      g.beginPath();g.arc(X,Y,9,0,7);g.fillStyle=want?'#ff6a4a':'#3fd2ff';g.fill();
       g.lineWidth=2.5;g.strokeStyle=ok?'#54e0a0':'#fb7185';g.beginPath();g.arc(X,Y,13,0,7);g.stroke();
       if(!ok){g.strokeStyle='#fb7185';g.lineWidth=2;g.beginPath();g.moveTo(X-7,Y-7);g.lineTo(X+7,Y+7);g.moveTo(X+7,Y-7);g.lineTo(X-7,Y+7);g.stroke();}});
     document.getElementById('acc').textContent=correct+'/4';
     const vd=document.getElementById('vd');
-    if(target!=='xor'){vd.textContent=trained?'one cut — learned':'press train';vd.style.color=trained?'#54e0a0':'#9aa0b8';}
+    if(target!=='xor'){vd.textContent=trained?'one cut — learned':'press train';vd.style.color=trained?'#54e0a0':'#94a0bd';}
     else if(depth){vd.textContent='2 layers — XOR solved';vd.style.color='#54e0a0';}
-    else{vd.textContent=trained?'one cut can’t — 3/4':'press train';vd.style.color=trained?'#fb7185':'#9aa0b8';}
+    else{vd.textContent=trained?'one cut can’t — 3/4':'press train';vd.style.color=trained?'#fb7185':'#94a0bd';}
     requestAnimationFrame(draw);
   }
   document.querySelectorAll('.t').forEach(b=>b.onclick=function(){document.querySelectorAll('.t').forEach(x=>x.classList.remove('on'));this.classList.add('on');target=this.dataset.t;trained=false;W=[0,0,0];});
